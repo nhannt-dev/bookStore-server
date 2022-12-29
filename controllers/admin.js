@@ -1,5 +1,14 @@
 'use strict'
-const cloudinary =  require('cloudinary').v2
+const   cloudinary =  require('cloudinary').v2
+        bcrypt = require('bcrypt')
+        jwt = require('jsonwebtoken')
+        fs = require('fs')
+        book = require('../models/book')
+        user = require('../models/user')
+        category = require('../models/category')
+        author = require('../models/author')
+        publisher = require('../models/publisher')
+
 let uploads = {}
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
@@ -7,11 +16,3 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_KEY_SECRET
     
 })
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const fs = require('fs')
-const book = require('../models/book')
-const user = require('../models/user')
-const category = require('../models/category')
-const author = require('../models/author')
-const publisher = require('../models/publisher')

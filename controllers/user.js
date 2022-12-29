@@ -48,6 +48,57 @@ exports.register = async (req, res) => {
     res.status(201).json({ msg: "success" })
 }
 
+exports.login = async (req, res) => {
+    if (typeof req.body.email === "undefined" || typeof req.body.password == "undefined") {
+        res.status(402).json({ msg: "Invalid data" })
+        return
+    }
+    let { email, password } = req.body
+    let userFind = null
+    try {
+        userFind = await user.findOne({ email: email })
+    } catch (err) {
+        res.json({ msg: err })
+        return
+    }
+    if (userFind == null) {
+        res.status(422).json({ msg: "Invalid data" })
+        return
+    }
+    if (!userFind.is_verify) {
+        res.status(401).json({ msg: "no_registration_confirmation" })
+        return
+    }
+    if (!bcrypt.compareSync(password, userFind.password)) {
+        res.status(422).json({ msg: "Invalid data" })
+        return
+    }
+    let token = jwt.sign({ email: email, iat: Math.floor(Date.now() / 1000) - 60 * 30 }, process.env.JWT_VERIFY)
+    res.status(200).json({
+        msg: "success",
+        token: token,
+        user: {
+            email: userFind.email,
+            firstName: userFind.firstName,
+            lastName: userFind.lastName,
+            address: userFind.address,
+            phone_number: userFind.phone_number,
+            id: userFind._id
+        }
+    })
+}
+
+exports.logout = async (req, res) => {
+    res.cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+    })
+    res.status(200).json({
+        success: true,
+        message: "Logged Out"
+    })
+}
+
 // exports.verifyAccount = async (req, res) => {
 //     if (typeof req.params.token === "undefined") {
 //         res.status(402).json({ msg: "!invalid" })
@@ -78,45 +129,7 @@ exports.register = async (req, res) => {
 //     res.status(200).json({ msg: "success!" })
 // }
 
-// exports.login = async (req, res) => {
-//     if (typeof req.body.email === "undefined" || typeof req.body.password == "undefined") {
-//         res.status(402).json({ msg: "Invalid data" })
-//         return
-//     }
-//     let { email, password } = req.body
-//     let userFind = null
-//     try {
-//         userFind = await user.findOne({ email: email })
-//     } catch (err) {
-//         res.json({ msg: err })
-//         return
-//     }
-//     if (userFind == null) {
-//         res.status(422).json({ msg: "Invalid data" })
-//         return
-//     }
-//     if (!userFind.is_verify) {
-//         res.status(401).json({ msg: "no_registration_confirmation" })
-//         return
-//     }
-//     if (!bcrypt.compareSync(password, userFind.password)) {
-//         res.status(422).json({ msg: "Invalid data" })
-//         return
-//     }
-//     let token = jwt.sign({ email: email, iat: Math.floor(Date.now() / 1000) - 60 * 30 }, process.env.JWT_VERIFY)
-//     res.status(200).json({
-//         msg: "success",
-//         token: token,
-//         user: {
-//             email: userFind.email,
-//             firstName: userFind.firstName,
-//             lastName: userFind.lastName,
-//             address: userFind.address,
-//             phone_number: userFind.phone_number,
-//             id: userFind._id
-//         }
-//     })
-// }
+
 
 // exports.requestForgotPassword = async (req, res) => {
 //     if (typeof req.params.email === "undefined") {

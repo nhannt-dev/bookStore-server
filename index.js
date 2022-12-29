@@ -1,12 +1,12 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const app = express()
-const path = require('path')
-const bodyParser = require('body-parser')
-const cors = require('cors')
-const userRouter = require('./routers/user')
 require('dotenv').config()
-const PORT = process.env.PORT || 5000
+const   express = require('express')
+        mongoose = require('mongoose')
+        app = express()
+        path = require('path')
+        bodyParser = require('body-parser')
+        cors = require('cors')
+        userRouter = require('./routers/user')
+        PORT = process.env.PORT || 5000
 
 mongoose.connect(process.env.DB_URL).then(() => {
     console.log('Ket noi DB thanh cong')
